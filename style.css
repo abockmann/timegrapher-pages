@@ -1,0 +1,387 @@
+
+* {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+:root {
+    --stats-top-panel-height: 8%;
+    --beat-profile-plot-height: 15%;
+    --button-row-height: 15%;
+    --border-color: #303030;
+    --bg-color: rgb(22, 22, 22);
+    --bg-color-light: #242424;
+    --text-hint: #747474;
+    --text-secondary: #c5c5c5;
+}
+
+html {
+    height: -webkit-fill-available;
+    user-select: none;
+    -webkit-user-select: none
+}
+
+.beat-plot-container {
+    flex: 0 0 62%;
+    width: 100%;
+    display: flex;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.beat-plot-zoom-button {
+    position: absolute;
+    width: 2.8rem;
+    height: 2.8rem;
+    border: none;
+    background-color: rgba(80, 80, 80, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    z-index: 10;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+@media (hover: hover) {
+    .beat-plot-zoom-button:hover {
+        background-color: rgba(120, 120, 120, 0.5);
+    }
+}
+
+.beat-plot-zoom-button:active {
+    background-color: rgba(150, 150, 150, 0.6);
+}
+
+/* Y subdivision buttons (vertical pair at top-right) */
+#y-plus-button {
+    top: 0.4rem;
+    right: 0.4rem;
+}
+
+#y-minus-button {
+    top: 3rem;
+    right: 0.4rem;
+}
+
+/* X subdivision buttons (horizontal pair at bottom-right) */
+#x-minus-button {
+    bottom: 0.4rem;
+    right: 3rem;
+}
+
+#x-plus-button {
+    bottom: 0.4rem;
+    right: 0.4rem;
+}
+
+canvas {
+    display: flex;
+    flex: 0 0 auto;
+    border: none;
+    /* border: 1px solid black; */
+    width: 100%;
+    height: 100%
+}
+
+
+/* Nested splits */
+
+.node {
+    display: flex;
+    border: none;
+    /* border: 1px solid black; */
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.horizontal {
+    flex-direction: column;
+}
+
+.vertical {
+    flex-direction: row;
+}
+
+.child {
+    flex-grow: 1;
+    min-height: 0;
+    min-width: 0;
+    position: relative;
+    height: 100%;
+    width: 100%
+}
+
+.top-panel-field {
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.auto-height {
+    height: auto;
+}
+
+
+.leaf {
+    border: 1px solid var(--border-color);
+}
+
+/* --- */
+
+body {
+    overflow: hidden;
+    font-family: Gauge, sans-serif;
+    background: #fff;
+    margin: 0;
+    height: 100dvh; 
+    min-height: -webkit-fill-available;
+    color: white; /* text color */
+    border: none;
+    background-color: var(--bg-color);
+}
+
+/* Stats top panel */
+
+.stats-top-panel {
+    flex: 0 0 var(--stats-top-panel-height);
+    justify-content: space-around;
+    align-items: center;
+    min-height: 10px;
+    font-size: 1rem;
+    background: var(--bg-color-light);
+    text-align: center;
+    min-width: 6ch; /* Adjust based on expected digit count */
+}
+
+.bold {
+    font-weight: bold;
+}
+
+
+/* Beat profile panel */
+
+.beat-profile-panel {
+    flex: 0 0 var(--beat-profile-plot-height);
+    height: var(--beat-profile-plot-height);
+    width: auto;
+}
+
+/* Buttons */
+
+.button-row {
+    flex: 0 0 var(--button-row-height);
+}
+
+.button-row button {
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    background: var(--bg-color-light);
+    color: white;
+}
+
+.button-row button:active {
+    background-size: 6vh;
+}
+
+.button-row button svg {
+    scale: 200%;
+}
+
+.button-row button:active svg {
+    scale: 220%;
+}
+
+.button-row .recording-active svg {
+    color: red;
+}
+
+.button-row .autodetection-active svg {
+    color: green;
+}
+
+
+
+/* settings menu */
+
+
+
+.settings-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-color-light);
+    color: var(--text-muted);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+    font-family: sans-serif;
+}
+
+.settings-menu-content {
+    padding: 20px;
+    position: relative;
+}
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 2px solid var(--border-color);
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.settings-item:last-child {
+    border-bottom: none;
+}
+.settings-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+.label {
+    font-weight: bold;
+    flex-grow: 1;
+    font-size: 16px;
+}
+.value {
+    color: var(--text-secondary);
+    margin-right: 15px;
+    font-size: 16px;
+}
+.arrow {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+.close-set-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #c5c5c5;
+}
+
+/* adopted from the shared stylesheets for widgets */
+
+
+.title {
+font-size: 18px;
+text-align: center;
+margin-bottom: 20px;
+}
+.value-display {
+min-width: 7ch;
+font-variant-numeric: tabular-nums;
+font-size: 36px;
+text-align: center;
+margin: 20px 0;
+}
+.value-display.swipe-to-set {
+cursor: ns-resize;
+user-select: none;
+padding: 20px;
+border: 2px dashed transparent;
+border-radius: 8px;
+}
+.value-display.swipe-to-set:hover {
+border-color: var(--border-color);
+}
+.option {
+background: none;
+border: none;
+padding: 12px;
+cursor: pointer;
+text-align: center;
+touch-action: manipulation;
+font-size: 14px;
+user-select: none;
+color: var(--text-secondary);
+min-width: 170px; /* ensure enough height */
+}
+.text-left-align {
+text-align: left !important;
+}
+
+.option:hover {
+background: var(--bg-hover);
+}
+
+.option.selected {
+background: none;
+border-color: var(--border-color);
+color: var(--text-primary);
+}
+
+.back-btn {
+background: none;
+color: var(--text-primary);
+border: none;
+padding: 10px;
+cursor: pointer;
+font-size: 12px;
+width: 100%;
+margin-top: 20px;
+touch-action: manipulation;
+}
+
+.widget {
+background: var(--bg-color-light);
+border: 2px solid var(--border-color);
+border-radius: 8px;
+padding: 20px;
+width: 90%;
+max-width: 350px;
+box-shadow: 0 0 15px var(--shadow);
+font-family: sans-serif;
+}
+
+.drag-hint {
+text-align: center;
+
+font-size: 14px;
+color: var(--text-hint);
+margin: 10px 0;
+}
+
+.beat-rate-detection-notifier {
+background: var(--bg-color-light);
+font-family: sans-serif;
+text-align: center;
+border: 2px solid var(--border-color);
+border-radius: 8px;
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%,-50%);
+z-index: 1001;
+display: none;
+padding: 2%;
+}
+
+.beat-rate-detection-notifier div {
+    text-align: center;
+}
+
+
+

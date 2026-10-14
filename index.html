@@ -1,0 +1,143 @@
+<html lang="en">
+
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="style.css" type="text/css">
+        <link rel="manifest" href="/manifest.json">
+        <script src="custom_elements.js"></script>
+    </head>
+
+
+
+    <body>
+    <div style="height: 100%">
+        <div class="node horizontal">
+            <div class="node vertical stats-top-panel">
+                <div class="child top-panel-field">
+                    <div>
+                        <span class="bold">RATE</span>
+                        </br>
+                        <span id="display-rate">-</span>
+                    </div>
+                </div>
+                <div class="child top-panel-field">
+                    <div>
+                        <span class="bold">AMPLITUDE</span>
+                        </br>
+                        <span id="display-amplitude">-</span>
+                    </div>
+                </div>
+                <div class="child top-panel-field">
+                    <div>
+                        <span class="bold">BEAT ERROR</span>
+                        </br>
+                        <span id="display-beat-error">-</span>
+                    </div>
+                </div>
+                <div class="child top-panel-field">
+                    <div>
+                        <span class="bold">PARAMETERS</span>
+                        </br>
+                        <span id="display-parameters">-</span>
+                    </div>
+                </div>
+            </div> 
+            
+            <div class="beat-plot-container">
+                <canvas id="beat-plot-canvas" class="child leaf"></canvas>
+                <!-- Zoom control buttons grouped in right corner -->
+                <!-- Y subdivision controls - vertical pair at top-right (+ on top, − below) -->
+                <button id="y-plus-button" class="beat-plot-zoom-button" title="Zoom in (amplitude)">
+                    <span>+</span>
+                </button>
+                <button id="y-minus-button" class="beat-plot-zoom-button" title="Zoom out (amplitude)">
+                    <span>−</span>
+                </button>
+                <!-- X subdivision controls - horizontal pair at bottom-right -->
+                <button id="x-minus-button" class="beat-plot-zoom-button" title="Zoom out (time)">
+                    <span>−</span>
+                </button>
+                <button id="x-plus-button" class="beat-plot-zoom-button" title="Zoom in (time)">
+                    <span>+</span>
+                </button>
+            </div>
+
+            <div class="beat-profile-panel">
+                <div class="node vertical">
+                    <canvas id="beat-profile-canvas" class="child leaf"></canvas>
+                </div>
+            </div>
+
+            <div class="button-row child">
+                <div class="node vertical">
+                    <button id="auto-detect-button" class="child leaf">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="button-row-icon"><path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0"/><path d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4"/></svg>
+                    </button>
+                    <button id="record-button" class="child leaf">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="button-row-icon"><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="13" rx="3"/></svg>
+                    </button>
+                    <button id="settings-button" class="child leaf">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="button-row-icon"><path d="M14 17H5"/><path d="M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- settings menu -->
+    <settings-menu id="settings-menu"></settings-menu>
+
+    <!-- widget container -->    
+    <widget-container id="widget-container"></widget-container>
+
+    <!-- beat rate detection in progress -->       
+    <div id="beat-rate-detection-notifier" class="beat-rate-detection-notifier">DETECTING BEAT RATE<div id="in-progress-dots">...</div></div>
+
+    <!-- beat rate detection done -->       
+    <div id="beat-rate-detection-done-notifier" class="beat-rate-detection-notifier"><span id="estimated-beat-rate-display">-</span> BPH</div>
+
+
+    <!-- register service worker -->  
+    <script>
+    if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+            console.log('Service Worker registered successfully:', registration.scope);
+            
+            // Optional: Check for updates periodically
+            registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'activated') {
+                console.log('New service worker activated');
+                // You could show a notification to the user here
+                }
+            });
+            });
+        })
+        .catch(error => {
+            console.log('Service Worker registration failed:', error);
+        });
+    });
+    }
+    </script>
+
+    </body>
+
+    <!-- Load WASM module first -->
+    <script src="timegrapher.js" defer></script>
+
+    <!-- Load other scripts -->
+    <script src="beatbuffer.js" defer></script>
+    <script src="visualization.js" defer></script>
+    <script src="ui.js" defer></script>  
+    <script type="module" src="webaudio.js"></script>  
+
+
+</html>
